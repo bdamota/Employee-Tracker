@@ -42,6 +42,7 @@ function initialOptions() {
   
             case "Add a Role":
               addRole();
+              promptRole();
               break;
   
             case "Add an Employee":
@@ -108,18 +109,9 @@ function initialOptions() {
     });
     
   };
-  
-  function addRole() {
-    getDepartments()
-    .then((rows) => {
-        let departmentNamesArr = []
-        let departmentArray = rows[0]
-        for (var i=0; i < departmentArray.length; i++) {
-          let department = departmentArray[i].name;
-          departmentNamesArr.push(department)
-        }
-  
-      inquirer.prompt([
+
+  function promptRole() {
+    inquirer.prompt([
         {
             // Prompt user role title
             type: "input",
@@ -152,7 +144,7 @@ function initialOptions() {
           connection.query('INSERT INTO roles SET ?',
             {
               title: response.roleTitle,
-              salary: response.salaryAmount,
+              salary: parseFloat(response.salaryInput),
               department_id: departmentID
             },
             function(err, res) {
@@ -160,9 +152,25 @@ function initialOptions() {
               console.log(response.roleTitle + ' added to roles!\n');
               initialOptions();
             });
-        })
-    })
-  };
+        });
+
+  
+  function addRole() {
+    getDepartments()
+    .then((rows) => {
+        let departmentNamesArr = []
+        let departmentArray = rows[0]
+        for (var i=0; i < departmentArray.length; i++) {  
+          let department = departmentArray[i].name;
+          console.log(department)
+          departmentNamesArr.push(department)
+        }
+        initialOptions();
+    });
+};
+
+  
+    
 
   function addEmployee() {
     getEmployees()
@@ -306,9 +314,9 @@ function updateEmployeeRole() {
           });
       });
   };
+  }
   
-
   initialOptions();
   
   
-  
+
