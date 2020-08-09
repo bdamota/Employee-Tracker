@@ -109,8 +109,61 @@ function initialOptions() {
     
   };
   
+  function addRole() {
+    getDepartments()
+    .then((rows) => {
+        let departmentNamesArr = []
+        let departmentArray = rows[0]
+        for (var i=0; i < departmentArray.length; i++) {
+          let department = departmentArray[i].name;
+          departmentNamesArr.push(department)
+        }
   
-
+      inquirer.prompt([
+        {
+            // Prompt user role title
+            type: "input",
+            name: "roleTitle",
+            message: "Enter the role title: "
+        },
+        {
+            // Prompt user for salary
+            type: "number",
+            name: "salary",
+            message: "Enter the role salary: "
+        },
+        {   
+            // Prompt user to select department role is under
+            type: "list",
+            name: "department",
+            message: "Enter the department of the role: ",
+            choices: departmentNamesArr
+        }])
+        .then((response) => {   
+            let departmentID
+            for (let i=0; i < departmentArray.length; i++) {
+              if (response.department === departmentArray[i].name) {
+                departmentID = departmentArray[i].id;
+                break
+              }
+            }
+  
+          // Added role to role table
+          connection.query('INSERT INTO roles SET ?',
+            {
+              title: response.roleTitle,
+              salary: response.salaryAmount,
+              department_id: departmentID
+            },
+            function(err, res) {
+              if (err) throw err;
+              console.log(response.roleTitle + ' added to roles!\n');
+              initialOptions();
+            });
+        })
+    })
+  };
+  
   initialOptions();
   
   

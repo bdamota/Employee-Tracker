@@ -1,7 +1,7 @@
 const connection = require('./database')
 
 function getDepartments() {
-    return connection.promise().query("SELECT * FROM departments")
+    return connection.promise().query("SELECT * FROM department")
   };
   
   function getRoles() {
