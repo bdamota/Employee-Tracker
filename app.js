@@ -69,5 +69,16 @@ function initialOptions() {
         initialOptions();
     });
   };
+
+  function viewAllRoles() {
+    //query to view roles with department ID returned with name
+    const query = connection.query("SELECT roles.id, roles.title, roles.salary, department.name as department FROM roles JOIN department ON roles.department_id = departments.id", function (err, res) {
+        if (err) throw err
+        console.log("Roles. \n")
+        console.table(res);
+        initialOptions();
+    });
+  };
+  
   
   
