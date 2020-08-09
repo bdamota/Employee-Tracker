@@ -163,7 +163,83 @@ function initialOptions() {
         })
     })
   };
-  
+
+  function addEmployee() {
+    getEmployees()
+    .then((employees) => {
+      let employeeNamesArr = []
+      let employeesArray = employees[0]
+      for (var i=0; i < employeesArray.length; i++) {
+        let employee = employeesArray[i].first_name + ' ' + employeesArray[i].last_name
+        employeeNamesArr.push(employee)
+      }
+      //add null option in array
+      employeeNamesArr.unshift('--')
+      getRoles()
+       .then((roles) => {
+        let roleTitlesArr = []
+        let rolesArray = roles[0]
+        for (var i=0; i < rolesArray.length; i++) {
+          let role = rolesArray[i].title
+          roleTitlesArr.push(role)
+        }
+
+          inquirer.prompt ([
+          {
+            type: 'input',
+            name: 'firstName',
+            message: 'Enter the first name of the employee: '
+          },
+          {
+            type: 'input',
+            name:'lastName',
+            message: 'Enter the last name of the employee: '
+          },
+          {
+            type: 'list',
+            name: 'role',
+            message: 'Choose the role of the employee: ',
+            choices: roleTitlesArr
+          },
+          {
+            type: 'list',
+            name: 'manager',
+            message: 'Choose the manager of the employee: ',
+            choices: employeeNamesArr
+          }])
+          .then(function(input) {
+            let roleID
+            for (let i=0; i < rolesArray.length; i++) {
+              if (input.role === rolesArray[i].title) {
+              roleID = rolesArray[i].id;
+              break
+              }
+            }
+
+            let managerID
+            for (let i=0; i < employeesArray.length; i++) {
+              if (input.manager === employeesArray[i].first_name + ' ' + employeesArray[i].last_name) {
+                managerID = employeesArray[i].id;
+                break
+              }
+            }
+            const query = connection.query( 'INSERT INTO employees SET ?',
+              {
+                first_name: input.firstName,
+                last_name: input.lastName,
+                role_id: roleID,
+                manager_id: managerID
+              },
+              function(err, res) {
+                if (err) throw err;
+                console.log('Employee added!\n');
+                initialOptions();
+              });
+        });
+      });
+    });
+};  
+
   initialOptions();
   
   
