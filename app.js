@@ -59,4 +59,15 @@ function initialOptions() {
       }
     })
   };
+
+  function viewAllDepartments() {
+    //query to view all departments
+    const query = connection.query("SELECT * FROM department", function (err, res) {
+        if (err) throw err
+        console.log("All Deparments. \n");
+        console.table(res);
+        initialOptions();
+    });
+  };
+  
   
