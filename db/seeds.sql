@@ -27,3 +27,4 @@ VALUES
   ('Shawn', 'Johnson', 6, 5),
   ('Sarah', 'Reed', 7, NULL),
   ('Jake', 'Jones', 8, 7);
+  

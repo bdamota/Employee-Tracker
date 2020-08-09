@@ -240,6 +240,74 @@ function initialOptions() {
     });
 };  
 
+function updateEmployeeRole() {
+    getEmployees()
+      .then((employees) => {
+        let employeeNamesArr = []
+        let employeesArray = employees[0]
+        for (var i=0; i < employeesArray.length; i++) {
+          let employee = employeesArray[i].first_name + ' ' + employeesArray[i].last_name
+          employeeNamesArr.push(employee)
+        }
+        getRoles()
+        .then((roles) => {
+           let roleTitlesArr = []
+           let rolesArray = roles[0]
+           for (var i=0; i < rolesArray.length; i++) {
+             let role = rolesArray[i].title
+             roleTitlesArr.push(role)
+           }
+  
+           inquirer.prompt([
+             {
+               type: "list",
+               name: "employee",
+               message: "Which employee's role would you like to update?",
+               choices: employeeNamesArr
+             },
+             {
+               type: "list",
+               name: "role",
+               message: "What is their new role?",
+               choices: roleTitlesArr
+             }])
+           .then((input) => {
+            let roleID
+            for (let i=0; i < rolesArray.length; i++) {
+              if (input.role === rolesArray[i].title) {
+              roleID = rolesArray[i].id;
+              break
+              }
+            }
+  
+            let employeeID
+            for (let i=0; i < employeesArray.length; i++) {
+              if (input.employee === employeesArray[i].first_name + ' ' + employeesArray[i].last_name) {
+                employeeID = employeesArray[i].id;
+                break
+              }
+            }
+            // Update employee role
+            connection.query('UPDATE employees SET ? WHERE ?', [
+                    {
+                      role_id: roleID
+                    },
+                    {
+                      id: employeeID
+                    }
+                  ],
+                  function(err, res) {
+                    if (err) throw err;
+                    console.log('Role updated!\n');
+                    initialOptions();
+                  }
+              );
+            });
+          });
+      });
+  };
+  
+
   initialOptions();
   
   
