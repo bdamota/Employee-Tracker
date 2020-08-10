@@ -1,9 +1,7 @@
 const inquirer = require('inquirer');
 const showTable = require('console.table');
-
 const connection = require('./db/database');
 const { getDepartments, getEmployees, getRoles } = require('./db/query.js')
-
 //Prompts 
 function initialOptions() {
     inquirer
@@ -42,7 +40,6 @@ function initialOptions() {
   
             case "Add a Role":
               addRole();
-              promptRole();
               break;
   
             case "Add an Employee":
@@ -60,7 +57,6 @@ function initialOptions() {
       }
     })
   };
-
   function viewAllDepartments() {
     //query to view all departments
     const query = connection.query("SELECT * FROM department", function (err, res) {
@@ -70,7 +66,6 @@ function initialOptions() {
         initialOptions();
     });
   };
-
   function viewAllRoles() {
     //query to view roles with department ID returned with name
     const query = connection.query("SELECT roles.id, roles.title, roles.salary, dept_name as department FROM roles JOIN department ON roles.department_id = department.id", function (err, res) {
@@ -80,7 +75,6 @@ function initialOptions() {
         initialOptions();
     });
   };
-
   function viewAllEmployees() {
     const query = connection.query("SELECT e1.id, e1.first_name, e1.last_name, roles.title as role, dept_name AS department, roles.salary, Concat(e2.first_name, ' ', e2.last_name) AS manager FROM employees e1 LEFT JOIN roles ON e1.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employees e2 ON e2.id = e1.manager_id", function (err, res) {
         if (err) throw err
@@ -89,7 +83,6 @@ function initialOptions() {
         initialOptions();
     });
   };
-
   function addDepartment() {
     inquirer.prompt ({
         type: 'input',
@@ -109,9 +102,17 @@ function initialOptions() {
     });
     
   };
-
-  function promptRole() {
-    inquirer.prompt([
+  
+  function addRole() {
+    getDepartments()
+    .then((rows) => {
+        let departmentNamesArr = []
+        let departmentArray = rows[0]
+        for (var i=0; i < departmentArray.length; i++) {
+          let departments = departmentArray[i].name;
+          departmentNamesArr.push(departments)
+        }
+      inquirer.prompt([
         {
             // Prompt user role title
             type: "input",
@@ -123,14 +124,8 @@ function initialOptions() {
             type: "number",
             name: "salary",
             message: "Enter the role salary: "
-        },
-        {   
-            // Prompt user to select department role is under
-            type: "list",
-            name: "department",
-            message: "Enter the department of the role: ",
-            choices: departmentNamesArr
-        }])
+        }
+         ])
         .then((response) => {   
             let departmentID
             for (let i=0; i < departmentArray.length; i++) {
@@ -144,7 +139,7 @@ function initialOptions() {
           connection.query('INSERT INTO roles SET ?',
             {
               title: response.roleTitle,
-              salary: parseFloat(response.salaryInput),
+              salary: response.salaryAmount,
               department_id: departmentID
             },
             function(err, res) {
@@ -153,24 +148,8 @@ function initialOptions() {
               initialOptions();
             });
         });
-
-  
-  function addRole() {
-    getDepartments()
-    .then((rows) => {
-        let departmentNamesArr = []
-        let departmentArray = rows[0]
-        for (var i=0; i < departmentArray.length; i++) {  
-          let department = departmentArray[i].name;
-          console.log(department)
-          departmentNamesArr.push(department)
-        }
-        initialOptions();
-    });
-};
-
-  
-    
+    })
+  };
 
   function addEmployee() {
     getEmployees()
@@ -191,7 +170,6 @@ function initialOptions() {
           let role = rolesArray[i].title
           roleTitlesArr.push(role)
         }
-
           inquirer.prompt ([
           {
             type: 'input',
@@ -223,7 +201,6 @@ function initialOptions() {
               break
               }
             }
-
             let managerID
             for (let i=0; i < employeesArray.length; i++) {
               if (input.manager === employeesArray[i].first_name + ' ' + employeesArray[i].last_name) {
@@ -265,7 +242,7 @@ function updateEmployeeRole() {
              let role = rolesArray[i].title
              roleTitlesArr.push(role)
            }
-  
+
            inquirer.prompt([
              {
                type: "list",
@@ -287,7 +264,7 @@ function updateEmployeeRole() {
               break
               }
             }
-  
+
             let employeeID
             for (let i=0; i < employeesArray.length; i++) {
               if (input.employee === employeesArray[i].first_name + ' ' + employeesArray[i].last_name) {
@@ -314,9 +291,6 @@ function updateEmployeeRole() {
           });
       });
   };
-  }
-  
-  initialOptions();
-  
-  
 
+
+  initialOptions();
