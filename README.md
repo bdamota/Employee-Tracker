@@ -3,7 +3,7 @@
 A command-line application to manage a company's employee database, using Node.js, Inquirer, and MySQL.
 
 ## Screenshot:
-!image[https://github.com/bdamota/Employee-Tracker/blob/master/Screen%20Shot%202020-08-09%20at%209.19.41%20PM.png]
+![image](https://github.com/bdamota/Employee-Tracker/blob/master/Screen%20Shot%202020-08-09%20at%209.19.41%20PM.png)
 
 ## Technologies:
 - JavaScript
